@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: citizen-service
+          uri: lb://citizen-service
+          predicates:
+            - Path=/citizens/**
+
+        - id: health-action-service
+          uri: lb://health-action-service
+          predicates:
+            - Path=/health-actions/**
+
+        - id: points-service
+          uri: lb://points-service
+          predicates:
+            - Path=/points/**
+
+        - id: sus-mock-service
+          uri: lb://sus-mock-service
+          predicates:
+            - Path=/sus/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

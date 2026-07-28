@@ -1,0 +1,298 @@
+{
+  "info": {
+    "_postman_id": "01407e49-f6a2-49bc-8499-a9fd8f4f7b74",
+    "name": "Gamificação da Saúde Preventiva",
+    "description": "Collection para testar o MVP do Hackathon FIAP (Fase 5) — Gamificação da Saúde Preventiva (SUS).\n\nFluxo sugerido (executar em ordem):\n1. SUS (mock) -> Listar Cidadãos no SUS (mock) — mostra a base federal simulada\n2. Cidadãos -> Sincronizar Cidadãos do SUS, depois Listar Cidadãos para obter um citizenId\n3. Ações de Saúde -> Registrar ações (credita pontos via evento Kafka)\n4. Pontos -> Consultar saldo\n\nAs requisições passam pelo api-gateway (porta 8080), que roteia para os microsserviços via Eureka.\nO citizenId é capturado automaticamente e reutilizado nas próximas requisições.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "discoveryUrl", "value": "http://localhost:8761", "type": "string" },
+    { "key": "citizenId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "SUS (mock)",
+      "item": [
+        {
+          "name": "Listar Cidadãos no SUS (mock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sus/citizens",
+              "host": ["{{baseUrl}}"],
+              "path": ["sus", "citizens"]
+            },
+            "description": "Mostra os dados fictícios da base nacional de cidadãos (CADSUS) simulada pelo sus-mock-service. Esta é a 'fonte' que o citizen-service sincroniza."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cidadãos",
+      "item": [
+        {
+          "name": "Sincronizar Cidadãos do SUS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/citizens/sync-sus",
+              "host": ["{{baseUrl}}"],
+              "path": ["citizens", "sync-sus"]
+            },
+            "description": "Busca os cidadãos no sus-mock-service e persiste os que ainda não existem (por CPF). Retorna { synced, skipped }. Idempotente: rodar de novo só incrementa skipped."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Cidadãos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const citizens = pm.response.json();",
+                  "if (citizens.length > 0) {",
+                  "    pm.collectionVariables.set(\"citizenId\", citizens[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/citizens",
+              "host": ["{{baseUrl}}"],
+              "path": ["citizens"]
+            },
+            "description": "Lista os cidadãos já sincronizados a partir do SUS. Captura o primeiro citizenId para as próximas requisições."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Cidadão por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/citizens/{{citizenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["citizens", "{{citizenId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ações de Saúde",
+      "item": [
+        {
+          "name": "Registrar Vacinação",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizenId\": \"{{citizenId}}\",\n  \"actionType\": \"VACCINATION\",\n  \"description\": \"Vacina contra Influenza - dose anual\",\n  \"proofDocumentUrl\": \"https://example.com/comprovantes/vacina-influenza.pdf\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/health-actions",
+              "host": ["{{baseUrl}}"],
+              "path": ["health-actions"]
+            },
+            "description": "Tipos de ação válidos (ActionType): VACCINATION (100 pts), PREVENTIVE_EXAM (150 pts)."
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Exame Preventivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizenId\": \"{{citizenId}}\",\n  \"actionType\": \"PREVENTIVE_EXAM\",\n  \"description\": \"Check-up anual - exames de rotina\",\n  \"proofDocumentUrl\": \"https://example.com/comprovantes/exame-preventivo.pdf\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/health-actions",
+              "host": ["{{baseUrl}}"],
+              "path": ["health-actions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Ações do Cidadão",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health-actions/citizen/{{citizenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["health-actions", "citizen", "{{citizenId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pontos",
+      "item": [
+        {
+          "name": "Consultar Saldo de Pontos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/points/{{citizenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["points", "{{citizenId}}"]
+            },
+            "description": "O crédito de pontos é assíncrono (evento Kafka health-action.registered). Se o saldo ainda estiver zerado, aguarde alguns segundos e repita a chamada."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Infraestrutura",
+      "item": [
+        {
+          "name": "Eureka Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{discoveryUrl}}",
+              "host": ["{{discoveryUrl}}"]
+            },
+            "description": "Painel do Eureka — confirma que todos os serviços estão registrados (UP)."
+          },
+          "response": []
+        },
+        {
+          "name": "API Gateway Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

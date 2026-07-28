@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaúdePoints — Pitch FIAP PosTech</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+<style>
+  /* ── Tokens ───────────────────────────────────────────────────── */
+  :root {
+    --red:    #E61E2E;
+    --blue:   #00B4D8;
+    --yellow: #FFD166;
+    --green:  #2DD48F;
+    --gray:   #A0A0B8;
+    --bg:     #0D0D1A;
+    --card:   #14142B;
+  }
+
+  /* ── Base ────────────────────────────────────────────────────── */
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides section {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-align: left;
+    height: 100%;
+    padding: 0 1.6rem;
+    box-sizing: border-box;
+  }
+
+  /* ── Tipografia ──────────────────────────────────────────────── */
+  .reveal h1 { font-size: 2.8rem; font-weight: 800; margin: 0; line-height: 1.1; }
+  .reveal h2 { font-size: 2.0rem; font-weight: 700; margin: 0 0 .4em; }
+  .reveal h3 { font-size: 1.3rem; font-weight: 600; margin: 0; color: var(--gray); }
+  .reveal p, .reveal li { font-size: 1.05rem; line-height: 1.55; color: #dde; }
+  .reveal ul { list-style: none; padding: 0; margin: 0; }
+  .reveal li { padding-left: 1.2em; position: relative; margin-bottom: .35em; }
+  .reveal li::before { content: "▶"; position: absolute; left: 0; color: var(--blue); font-size: .75em; top: .22em; }
+
+  /* ── Utilitários de cor ──────────────────────────────────────── */
+  .red    { color: var(--red);    }
+  .blue   { color: var(--blue);   }
+  .yellow { color: var(--yellow); }
+  .green  { color: var(--green);  }
+  .gray   { color: var(--gray);   }
+  .white  { color: #fff;          }
+
+  /* ── Label de seção (topo) ───────────────────────────────────── */
+  .section-label {
+    font-size: .75rem; font-weight: 700; letter-spacing: .15em;
+    text-transform: uppercase; margin-bottom: .5em;
+  }
+
+  /* ── Separador ───────────────────────────────────────────────── */
+  .divider {
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--red) 0%, var(--blue) 100%);
+    margin: .5em 0;
+    border: none;
+  }
+
+  /* ── Cards ───────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    border-left: 4px solid var(--blue);
+  }
+  .card.red    { border-color: var(--red);    }
+  .card.yellow { border-color: var(--yellow); }
+  .card.green  { border-color: var(--green);  }
+
+  /* ── Grid helpers ────────────────────────────────────────────── */
+  .cols-2  { display: grid; grid-template-columns: 1fr 1fr;     gap: .8rem; }
+  .cols-3  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .8rem; }
+  .cols-23 { display: grid; grid-template-columns: 2fr 3fr;     gap: 1rem; }
+  .cols-32 { display: grid; grid-template-columns: 3fr 2fr;     gap: 1rem; }
+
+  /* ── Stat big ────────────────────────────────────────────────── */
+  .stat { text-align: center; padding: .6rem .4rem; }
+  .stat .num { font-size: 2.6rem; font-weight: 900; line-height: 1; }
+  .stat .lbl { font-size: .78rem; color: var(--gray); margin-top: .2em; line-height: 1.35; }
+
+  /* ── Barra horizontal ────────────────────────────────────────── */
+  .bar-row { display: flex; align-items: center; margin-bottom: .5rem; gap: .6rem; }
+  .bar-row .bar-label { flex: 0 0 11rem; font-size: .88rem; color: #dde; text-align: right; }
+  .bar-row .bar-track { flex: 1; background: #2A2A40; border-radius: 4px; overflow: hidden; }
+  .bar-row .bar-fill  { height: 22px; border-radius: 4px; transition: width 1s ease; }
+  .bar-row .bar-val   { flex: 0 0 4rem; font-size: .9rem; font-weight: 700; color: var(--yellow); }
+
+  /* ── Tag pill ────────────────────────────────────────────────── */
+  .tag {
+    display: inline-block;
+    background: #003050;
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    padding: .15em .75em;
+    font-size: .8rem;
+    color: #fff;
+    margin: .2em .15em;
+  }
+
+  /* ── Timeline ────────────────────────────────────────────────── */
+  .timeline-item {
+    display: flex; align-items: flex-start; margin-bottom: .55rem; gap: .75rem;
+  }
+  .timeline-item .year {
+    flex: 0 0 3.5rem; background: var(--blue); color: #000;
+    font-weight: 800; font-size: .9rem; text-align: center;
+    padding: .3em 0; border-radius: 4px;
+  }
+  .timeline-item .year.red    { background: var(--red);    color: #fff; }
+  .timeline-item .year.yellow { background: var(--yellow); color: #000; }
+  .timeline-item .year.green  { background: var(--green);  color: #000; }
+  .timeline-item .event { font-size: .95rem; padding-top: .25em; line-height: 1.4; }
+
+  /* ── Quote ───────────────────────────────────────────────────── */
+  .quote {
+    border-left: 4px solid var(--blue);
+    padding: .6rem 1rem;
+    background: var(--card);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: .6rem;
+  }
+  .quote p { font-style: italic; font-size: 1rem; margin: 0 0 .25em; color: #fff; }
+  .quote .source { font-size: .75rem; color: var(--gray); }
+
+  /* ── Capa ────────────────────────────────────────────────────── */
+  .cover-accent {
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), var(--blue));
+    margin: .6em 0;
+  }
+
+  /* ── Persona ─────────────────────────────────────────────────── */
+  .persona-icon { font-size: 4rem; text-align: center; }
+
+  /* ── Rodapé de fonte ─────────────────────────────────────────── */
+  .source-footer {
+    position: absolute; bottom: .4rem; left: 1.6rem; right: 1.6rem;
+    font-size: .6rem; color: var(--gray); font-style: italic;
+  }
+
+  /* ── Slide de fechamento ─────────────────────────────────────── */
+  .closing-icon {
+    position: absolute; right: -1rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 18rem; opacity: .06; pointer-events: none;
+    line-height: 1;
+  }
+
+  /* ── Fragment overrides ──────────────────────────────────────── */
+  .reveal .fragment { opacity: 0; transform: translateY(12px); transition: all .45s ease; }
+  .reveal .fragment.visible { opacity: 1; transform: none; }
+
+  /* ── Progress bar ────────────────────────────────────────────── */
+  .reveal .progress { color: var(--red); }
+
+  /* ── Botão PDF ───────────────────────────────────────────────── */
+  #pdf-btn {
+    position: fixed; bottom: 1.2rem; left: 1.2rem; z-index: 9999;
+    background: var(--red); color: #fff;
+    border: none; border-radius: 8px;
+    padding: .5rem 1rem; font-size: .85rem; font-weight: 700;
+    cursor: pointer; letter-spacing: .04em;
+    display: flex; align-items: center; gap: .4rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,.5);
+    transition: background .2s, transform .15s;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  #pdf-btn:hover { background: #c0111f; transform: translateY(-2px); }
+
+  /* ── Banner de instrução (modo print-pdf) ────────────────────── */
+  #print-banner {
+    display: none;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    background: #1a3a1a; border-bottom: 2px solid var(--green);
+    padding: .6rem 1.2rem; font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: .9rem; color: #fff; text-align: center;
+  }
+  #print-banner kbd {
+    background: #2dd48f22; border: 1px solid var(--green);
+    border-radius: 4px; padding: .1em .45em;
+    font-size: .9em; color: var(--green); font-family: monospace;
+  }
+  #print-banner .close-banner {
+    position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--gray);
+    font-size: 1.1rem; cursor: pointer;
+  }
+
+  /* ── Links nas fontes ────────────────────────────────────────── */
+  .source-footer a, .quote .source a, .ref-list a {
+    color: var(--blue); text-decoration: none; border-bottom: 1px dotted var(--blue);
+  }
+  .source-footer a:hover, .quote .source a:hover, .ref-list a:hover { opacity: .75; }
+
+  /* ── Slide de referências ────────────────────────────────────── */
+  .ref-list { list-style: none; padding: 0; margin: 0; }
+  .ref-list li { padding-left: 0; margin-bottom: .55rem; font-size: .82rem; line-height: 1.45; }
+  .ref-list li::before { display: none; }
+  .ref-list .ref-num {
+    display: inline-block; width: 1.4em; font-weight: 700;
+    color: var(--blue); flex-shrink: 0;
+  }
+  .ref-item { display: flex; gap: .3rem; align-items: flex-start; }
+  .ref-tag {
+    display: inline-block; background: #003050; border: 1px solid var(--blue);
+    border-radius: 4px; padding: .05em .45em; font-size: .7rem;
+    color: var(--blue); white-space: nowrap; margin-right: .3em; flex-shrink: 0;
+  }
+  .ref-tag.red    { border-color: var(--red);    color: var(--red);    background: #2a0808; }
+  .ref-tag.yellow { border-color: var(--yellow); color: var(--yellow); background: #1a1400; }
+  .ref-tag.green  { border-color: var(--green);  color: var(--green);  background: #04200f; }
+</style>
+</head>
+<body>
+<!-- Banner modo impressão -->
+<div id="print-banner">
+  ✅ Modo PDF ativo — todos os slides estão carregados.
+  Pressione <kbd>Ctrl+P</kbd> (ou <kbd>⌘+P</kbd> no Mac),
+  escolha <strong>Salvar como PDF</strong> e clique em <strong>Salvar</strong>.
+  <button class="close-banner" onclick="document.getElementById('print-banner').style.display='none'">✕</button>
+</div>
+
+<!-- Botão PDF (modo normal) -->
+<button id="pdf-btn" title="Exportar apresentação como PDF">
+  ⬇ Baixar PDF
+</button>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 1 — CAPA                                              -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <h1 style="font-size:3.4rem">SaúdePoints</h1>
+  <h2 class="blue" style="font-weight:400;font-size:1.6rem">Gamificação da Saúde Preventiva</h2>
+  <div class="cover-accent"></div>
+  <p style="font-size:1.15rem;color:#ccc;font-style:italic;margin:.6em 0 1.2em">
+    Por que o Brasil precisa de incentivos<br>para prevenir antes de remediar?
+  </p>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 2 — O SARAMPO VOLTOU                                  -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label red">O Problema</p>
+  <h2>O Brasil eliminou o sarampo.<br><span class="red">Em 2025, ele voltou.</span></h2>
+  <hr class="divider">
+
+  <div class="timeline-item fragment">
+    <div class="year">2016</div>
+    <div class="event">Brasil recebe o <strong>certificado de eliminação do sarampo</strong> pela OMS — conquista de décadas de vacinação em massa.</div>
+  </div>
+  <div class="timeline-item fragment">
+    <div class="year yellow">2019</div>
+    <div class="event yellow">Surtos em AM e PA — <strong>mais de 10.000 casos</strong>. Sinal de alerta ignorado.</div>
+  </div>
+  <div class="timeline-item fragment">
+    <div class="year green">2021</div>
+    <div class="event green">Surto controlado — cobertura vacinal <strong>recuperada parcialmente</strong>; casos caem a níveis residuais.</div>
+  </div>
+  <div class="timeline-item fragment">
+    <div class="year red">2025</div>
+    <div class="event red"><strong>34 casos confirmados</strong>. Surtos declarados em TO, MA e MT.<br>Ministério da Saúde emite alerta nacional.</div>
+  </div>
+
+  <div class="card red fragment" style="margin-top:.8rem;text-align:center">
+    <p style="margin:0;font-weight:700;font-size:1rem;color:#fff">
+      Uma doença erradicada voltou porque as pessoas pararam de se vacinar.
+    </p>
+  </div>
+  <div class="source-footer">
+    Fonte:
+    <a href="https://www.gov.br/saude/pt-br/assuntos/noticias/2023/dezembro/brasil-reverte-tendencia-de-queda-nas-coberturas-vacinais-e-oito-imunizantes-do-calendario-infantil-registram-alta-em-2023" target="_blank">Ministério da Saúde</a> ·
+    <a href="https://agenciabrasil.ebc.com.br/saude/noticia/2025-10/brasil-registra-34-casos-de-sarampo-ministerio-da-saude-emite-alerta" target="_blank">Agência Brasil</a> ·
+    <a href="https://theconversation.com/sarampo-preocupa-profissionais-da-saude-mas-retorno-da-doenca-ao-brasil-pode-ser-evitado-279731" target="_blank">The Conversation (2025)</a>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 3 — A QUEDA EM NÚMEROS                                -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label red">O Problema</p>
+  <h2>A queda da cobertura vacinal</h2>
+  <div class="card green" style="text-align:center;padding:.4rem;margin-bottom:.6rem">
+    <span style="font-size:.85rem;font-weight:700;color:#fff">META MÍNIMA DO MINISTÉRIO DA SAÚDE: <span class="green">95%</span> de cobertura vacinal</span>
+  </div>
+
+  <p style="font-size:.8rem;color:var(--gray);margin-bottom:.4rem">Tríplice Viral (sarampo) — 2ª dose</p>
+
+  <div class="bar-row fragment">
+    <div class="bar-label">2014</div>
+    <div class="bar-track"><div class="bar-fill" style="width:96%;background:var(--green)"></div></div>
+    <div class="bar-val green">96% ✓</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">2019</div>
+    <div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--yellow)"></div></div>
+    <div class="bar-val yellow">88%</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">2022</div>
+    <div class="bar-track"><div class="bar-fill" style="width:80%;background:var(--red)"></div></div>
+    <div class="bar-val red">80,3%</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">2025 *</div>
+    <div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--red)"></div></div>
+    <div class="bar-val red">74,6% ✗</div>
+  </div>
+
+  <div class="cols-3 fragment" style="margin-top:.7rem">
+    <div class="card red">
+      <div class="stat">
+        <div class="num red">4</div>
+        <div class="lbl">estados cumprindo<br>a meta em 2023<br>(vs. <strong>todos</strong> em 2014)</div>
+      </div>
+    </div>
+    <div class="card yellow">
+      <div class="stat">
+        <div class="num yellow">+60%</div>
+        <div class="lbl">dos municípios<br>abaixo da meta<br>em 2023</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stat">
+        <div class="num blue">32%</div>
+        <div class="lbl">dos municípios<br>cumpriram a meta<br>para os 4 imunizantes</div>
+      </div>
+    </div>
+  </div>
+  <div class="source-footer">
+    * dados preliminares &nbsp;|&nbsp; Fonte:
+    <a href="https://www.gov.br/saude/pt-br/assuntos/noticias/2023/dezembro/brasil-reverte-tendencia-de-queda-nas-coberturas-vacinais-e-oito-imunizantes-do-calendario-infantil-registram-alta-em-2023" target="_blank">Min. Saúde</a> ·
+    <a href="https://butantan.gov.br/noticias/maioria-dos-municipios-brasileiros-nao-atingiu-a-meta-de-cobertura-para-vacinas-do-calendario-infantil-em-2023" target="_blank">Instituto Butantan</a> ·
+    <a href="https://sbim.org.br/noticias/anuario-vacinabr-analisa-cenario-das-coberturas-vacinais-no-brasil" target="_blank">SBIM — Anuário VacinaBR</a>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 4 — POR QUE NÃO SE VACINAM?                          -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label red">O Problema</p>
+  <h2>Por que as pessoas não se vacinam?</h2>
+  <p style="font-size:.8rem;color:var(--gray);margin-bottom:.1rem">Pesquisa UFMG — Hesitância Vacinal no Brasil</p>
+  <p style="font-size:.75rem;color:var(--gray);margin-bottom:.5rem">Distribuição do <strong>principal motivo</strong> citado pelos hesitantes para não se vacinar</p>
+
+  <div class="bar-row fragment">
+    <div class="bar-label">Efeitos colaterais</div>
+    <div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--red)"></div></div>
+    <div class="bar-val">33%</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">"Não estava doente"</div>
+    <div class="bar-track"><div class="bar-fill" style="width:21%;background:#c45"></div></div>
+    <div class="bar-val">21%</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">Medo de agulhas</div>
+    <div class="bar-track"><div class="bar-fill" style="width:17%;background:#a33"></div></div>
+    <div class="bar-val">17%</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">Desinformação</div>
+    <div class="bar-track"><div class="bar-fill" style="width:16%;background:#922"></div></div>
+    <div class="bar-val">16%</div>
+  </div>
+  <div class="bar-row fragment">
+    <div class="bar-label">Influência religiosa</div>
+    <div class="bar-track"><div class="bar-fill" style="width:13%;background:#722"></div></div>
+    <div class="bar-val">13%</div>
+  </div>
+
+  <div class="card fragment" style="margin-top:.7rem;border-color:var(--blue)">
+    <p style="margin:0;font-size:.95rem;color:#fff">
+      <span class="blue">⚠</span>&nbsp; Nenhum estudo cita como motivo: <strong>"não havia nenhum benefício imediato em se vacinar"</strong>
+      — mas esse é o fator de fundo que torna todos os outros mais pesados.
+    </p>
+  </div>
+  <div class="source-footer">
+    Fonte:
+    <a href="https://www.metropoles.com/saude/pesquisa-aponta-principais-motivos-que-afastam-brasileiros-das-vacinas" target="_blank">UFMG / Metrópoles</a> ·
+    <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10581683/" target="_blank">NIH PMC10581683</a> ·
+    <a href="https://sbmfc.org.br/noticias/hesitacao-vacinal/" target="_blank">SBMFC — Hesitação Vacinal</a> ·
+    <a href="https://www.scielo.br/j/sausoc/a/zsfSyPJq7ZBdGFszkY6Mbvc/?format=html&lang=pt" target="_blank">SciELO / Saúde e Sociedade</a>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 5 — O CUSTO DA OMISSÃO                                -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label red">O Problema</p>
+  <h2>O custo da falta de prevenção</h2>
+  <hr class="divider">
+
+  <div class="card red fragment" style="text-align:center;padding:1rem .5rem">
+    <div class="num" style="font-size:3rem;font-weight:900;color:var(--red)">R$ 3,84 bilhões</div>
+    <p style="margin:.3em 0 0;color:#ccc;font-size:.95rem">
+      gastos pelo SUS em 2018 <strong>somente</strong> com internações por doenças crônicas evitáveis<br>
+      <span style="font-size:.85rem;color:var(--gray)">(hipertensão, diabetes e obesidade)</span>
+    </p>
+  </div>
+
+  <div class="cols-3 fragment" style="margin-top:.8rem">
+    <div class="card yellow">
+      <div class="stat">
+        <div class="num yellow">72%</div>
+        <div class="lbl">das mortes no Brasil são<br>causadas por doenças<br>crônicas <strong>evitáveis</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stat">
+        <div class="num blue" style="font-size:1.6rem">R$ 3 a R$ 10</div>
+        <div class="lbl">economizados no tratamento<br>para cada <strong>R$ 1</strong> investido<br>em prevenção (OMS)</div>
+      </div>
+    </div>
+    <div class="card green">
+      <div class="stat">
+        <div class="num green">150 mi</div>
+        <div class="lbl">brasileiros dependem<br>exclusivamente do SUS<br>(75% da população)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card fragment" style="margin-top:.7rem;border-color:var(--blue);text-align:center">
+    <p style="margin:0;font-size:.9rem;color:#fff">
+      O SUS não tem um problema de <em>oferta</em> de prevenção.
+      Tem um problema de <strong class="blue">adesão</strong>.
+    </p>
+  </div>
+  <div class="source-footer">
+    Fonte:
+    <a href="https://www.scielosp.org/article/rpsp/2020.v44/e32/" target="_blank">SciELO / Rev. Saúde Pública 2020</a> ·
+    <a href="https://hilab.com.br/blog/prevencao-e-controle-das-dcnt-e-a-reducao-de-custos-em-saude-publica/" target="_blank">Hilab — Prevenção e DCNT</a> ·
+    <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/d/doencas-cronicas-nao-transmissiveis" target="_blank">Ministério da Saúde — DCNT</a>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 6 — A SOLUÇÃO: E SE VALESSE ALGO?                     -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label blue">A Solução</p>
+  <h2>E se prevenção valesse alguma coisa <span class="blue">agora</span>?</h2>
+  <hr class="divider">
+
+  <div class="cols-2" style="margin-top:.5rem">
+    <div class="card red">
+      <p class="red" style="font-weight:700;margin-bottom:.4em">HOJE</p>
+      <p style="color:#ccc">Cidadão se vacina</p>
+      <p style="color:#ccc">→ recebe: <strong class="red">NADA</strong></p>
+      <p style="font-size:.85rem;color:var(--gray);font-style:italic">
+        (além de proteção futura<br>e hipotética)
+      </p>
+    </div>
+    <div class="card fragment" style="border-color:var(--blue)">
+      <p class="blue" style="font-weight:700;margin-bottom:.4em">COM SAÚDEPOINTS</p>
+      <p>Cidadão se vacina</p>
+      <p>→ recebe: <strong class="yellow">100 pontos</strong></p>
+      <p>→ troca por: <strong class="green">crédito no ônibus<br>que usa todo dia</strong></p>
+    </div>
+  </div>
+
+  <div class="card fragment" style="margin-top:.9rem;text-align:center;border-color:var(--blue);padding:.9rem">
+    <p style="margin:0;font-size:1.1rem;font-weight:700;color:#fff">
+      Um <span class="blue">programa de fidelidade</span> da saúde pública —<br>
+      usando serviços públicos que já existem como recompensa.
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 7 — COMO FUNCIONA                                     -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label blue">A Solução</p>
+  <h2>Como funciona o SaúdePoints</h2>
+  <hr class="divider">
+
+  <div class="cols-2 fragment" style="margin-bottom:.5rem">
+    <div class="card" style="text-align:center;border-color:var(--red)">
+      <div style="font-size:2.2rem">💉</div>
+      <p style="margin:.2em 0 0;font-size:.9rem">Vacinação em dia</p>
+      <div class="num red" style="font-size:1.5rem;font-weight:900">+100 pts</div>
+    </div>
+    <div class="card" style="text-align:center;border-color:var(--blue)">
+      <div style="font-size:2.2rem">🔬</div>
+      <p style="margin:.2em 0 0;font-size:.9rem">Exame preventivo anual</p>
+      <div class="num blue" style="font-size:1.5rem;font-weight:900">+150 pts</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:1.4rem;color:var(--blue);margin:.2rem 0" class="fragment">
+    ↓ &nbsp;<span style="font-size:.85rem;color:var(--gray)">acumula pontos</span>&nbsp; ↓
+  </div>
+
+  <div class="cols-3 fragment">
+    <div class="card" style="text-align:center;border-color:var(--green);background:#04200f">
+      <div style="font-size:2rem">🚌</div>
+      <p style="margin:.2em 0 0;font-size:.85rem">Crédito R$10<br>transporte público</p>
+      <div class="num green" style="font-size:1.3rem;font-weight:900">200 pts</div>
+    </div>
+    <div class="card" style="text-align:center;border-color:var(--yellow);background:#1a1500">
+      <div style="font-size:2rem">⚡</div>
+      <p style="margin:.2em 0 0;font-size:.85rem">Desconto 5%<br>conta de energia</p>
+      <div class="num yellow" style="font-size:1.3rem;font-weight:900">300 pts</div>
+    </div>
+    <div class="card" style="text-align:center;border-color:var(--blue);background:#04141e">
+      <div style="font-size:2rem">🎭</div>
+      <p style="margin:.2em 0 0;font-size:.85rem">Meia-entrada<br>evento cultural</p>
+      <div class="num blue" style="font-size:1.3rem;font-weight:900">150 pts</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 8 — A CIÊNCIA POR TRÁS                                -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label blue">A Solução</p>
+  <h2>A ciência por trás da ideia</h2>
+  <hr class="divider">
+
+  <div class="quote fragment">
+    <p>"Recompensas garantidas de aproximadamente US$25 podem aumentar significativamente a adesão vacinal."</p>
+    <div class="source">— <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8966995/" target="_blank">NIH / PMC8966995 (2022)</a> — Estudo experimental sobre incentivos financeiros para vacinação</div>
+  </div>
+
+  <div class="quote fragment" style="border-color:var(--yellow)">
+    <p>"A gamificação resultou em diminuição dos sintomas e aumento do engajamento nos cuidados de saúde."</p>
+    <div class="source">— <a href="https://www.frontiersin.org/journals/psychology" target="_blank">Frontiers in Psychology (2019)</a></div>
+  </div>
+
+  <div class="quote fragment" style="border-color:var(--green)">
+    <p>"65% dos consumidores preferem interagir com marcas que oferecem programa de benefícios."</p>
+    <div class="source">— <a href="https://www.consumidormoderno.com.br/2021/03/18/incentivo-financeiro-principal-interesse-programas-de-fidelidade/" target="_blank">Pesquisa Consumidor Moderno (2021)</a></div>
+  </div>
+
+  <div class="card fragment" style="text-align:center;margin-top:.6rem;border-color:var(--blue)">
+    <p style="margin:0;font-size:.95rem;color:#fff">
+      Não estamos inventando comportamento humano —
+      estamos usando <strong class="blue">o que já se sabe que funciona</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 9 — IMPACTO                                           -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label green">Impacto</p>
+  <h2>O que muda com o SaúdePoints</h2>
+  <hr class="divider">
+
+  <div class="cols-23">
+    <div class="card" style="border-color:var(--blue)">
+      <div class="persona-icon">👩</div>
+      <p style="font-weight:700;margin:.2em 0 .1em;font-size:.9rem;color:var(--blue)">Maria, 42 anos — usuária do SUS</p>
+      <p style="font-size:.82rem;color:#ccc;line-height:1.5">
+        Trabalhadora. Nunca fez mamografia<br>porque "não estava doente".<br><br>
+        Com SaúdePoints:<br>
+        → Faz a mamografia <span class="blue">(+150 pts)</span><br>
+        → Acumula crédito no ônibus<br>
+        → Detecção precoce salva uma vida<br>
+        &nbsp;&nbsp;&nbsp;e economiza um tratamento inteiro
+      </p>
+    </div>
+    <div>
+      <div class="card fragment" style="margin-bottom:.55rem;border-color:var(--blue)">
+        <p style="font-weight:700;color:var(--blue);margin-bottom:.2em;font-size:.88rem">Para o Cidadão</p>
+        <p style="font-size:.82rem;color:#dde;margin:0">Benefício concreto e imediato · Diagnóstico precoce · Maior qualidade de vida</p>
+      </div>
+      <div class="card fragment" style="margin-bottom:.55rem;border-color:var(--yellow)">
+        <p style="font-weight:700;color:var(--yellow);margin-bottom:.2em;font-size:.88rem">Para o SUS</p>
+        <p style="font-size:.82rem;color:#dde;margin:0">Menos internações evitáveis · Melhor distribuição de recursos · Dados de saúde por região</p>
+      </div>
+      <div class="card fragment" style="border-color:var(--green)">
+        <p style="font-weight:700;color:var(--green);margin-bottom:.2em;font-size:.88rem">Para o País</p>
+        <p style="font-size:.82rem;color:#dde;margin:0">Cobertura vacinal acima de 95% · Menor risco de surtos · Redução estrutural do custo das DCNT</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 10 — PRÓXIMOS PASSOS                                  -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label yellow">Próximos Passos</p>
+  <h2>O caminho para escalar o impacto</h2>
+  <hr class="divider">
+
+  <div class="cols-3">
+    <div class="card fragment" style="border-color:var(--blue)">
+      <p style="font-weight:700;color:var(--blue);font-size:1rem;margin-bottom:.1em">PILOTO</p>
+      <p style="color:var(--gray);font-size:.75rem;margin-bottom:.5em">0 – 3 meses</p>
+      <ul style="font-size:.82rem">
+        <li>Validar modelo com 1 município</li>
+        <li>Fechar 1ª parceria: transporte público</li>
+        <li>Atingir 10 mil cidadãos ativos</li>
+        <li>Medir adesão vacinal no grupo piloto</li>
+      </ul>
+    </div>
+    <div class="card fragment" style="border-color:var(--yellow)">
+      <p style="font-weight:700;color:var(--yellow);font-size:1rem;margin-bottom:.1em">EXPANSÃO</p>
+      <p style="color:var(--gray);font-size:.75rem;margin-bottom:.5em">3 – 6 meses</p>
+      <ul style="font-size:.82rem">
+        <li>Ampliar para 5 municípios</li>
+        <li>Novos parceiros: energia e cultura</li>
+        <li>Atingir 100 mil cidadãos ativos</li>
+        <li>Publicar relatório de impacto</li>
+      </ul>
+    </div>
+    <div class="card fragment" style="border-color:var(--green)">
+      <p style="font-weight:700;color:var(--green);font-size:1rem;margin-bottom:.1em">ESCALA</p>
+      <p style="color:var(--gray);font-size:.75rem;margin-bottom:.5em">6 – 12 meses</p>
+      <ul style="font-size:.82rem">
+        <li>Parceria com Ministério da Saúde</li>
+        <li>Conexão com base nacional do SUS</li>
+        <li>1 milhão de cidadãos beneficiados</li>
+        <li>Novos tipos de ação preventiva</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card fragment" style="margin-top:.8rem;text-align:center;border-color:var(--blue)">
+    <p style="margin:0;font-size:.9rem;color:#fff">
+      Cada fase financia a próxima — <span class="blue">parceiros economizam com saúde preventiva</span>,
+      o SUS economiza com internações evitáveis.
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 12 — FECHAMENTO                                       -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="closing-icon">⚕</div>
+
+  <blockquote style="border-left:3px solid var(--gray);padding-left:1rem;margin:0 0 .8em;color:var(--gray);font-style:italic;font-size:1rem">
+    "Em 2014: todos os estados vacinavam 95% da população.<br>
+    Em 2023: apenas 4 estados conseguiam isso."
+  </blockquote>
+
+  <p class="fragment" style="font-size:1.3rem;color:#fff;margin-bottom:.2em">Não faltam vacinas.</p>
+  <p class="fragment" style="font-size:1.3rem;color:#fff;margin-bottom:.2em">Não faltam postos de saúde.</p>
+  <p class="fragment" style="font-size:1.3rem;color:#fff;margin-bottom:.6em">Não faltam profissionais dedicados.</p>
+
+  <hr class="divider fragment">
+
+  <h2 class="red fragment" style="font-size:1.8rem;margin:.5em 0 .2em">
+    Falta um motivo para o cidadão ir <em>hoje</em>.
+  </h2>
+
+  <h1 class="blue fragment" style="font-size:2.4rem;margin:.3em 0 .1em">
+    SaúdePoints — esse é o motivo.
+  </h1>
+
+  <p class="fragment" style="font-size:1.05rem;color:var(--gray);font-style:italic;margin-top:.3em">
+    Prevenção que vale. Saúde que recompensa.
+  </p>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 13 — REFERÊNCIAS                                      -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<section>
+  <p class="section-label blue">Referências</p>
+  <h2 style="font-size:1.6rem;margin-bottom:.4em">Fontes dos dados apresentados</h2>
+  <hr class="divider">
+
+  <div class="cols-2" style="gap:1.2rem">
+    <ul class="ref-list">
+      <li class="ref-item">
+        <span class="ref-tag red">S2–S3</span>
+        <span>
+          <a href="https://agenciabrasil.ebc.com.br/saude/noticia/2025-10/brasil-registra-34-casos-de-sarampo-ministerio-da-saude-emite-alerta" target="_blank">Agência Brasil — 34 casos de sarampo (2025)</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag red">S2–S3</span>
+        <span>
+          <a href="https://theconversation.com/sarampo-preocupa-profissionais-da-saude-mas-retorno-da-doenca-ao-brasil-pode-ser-evitado-279731" target="_blank">The Conversation — Retorno do sarampo ao Brasil</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag red">S3</span>
+        <span>
+          <a href="https://www.gov.br/saude/pt-br/assuntos/noticias/2023/dezembro/brasil-reverte-tendencia-de-queda-nas-coberturas-vacinais-e-oito-imunizantes-do-calendario-infantil-registram-alta-em-2023" target="_blank">Ministério da Saúde — Coberturas vacinais 2023</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag red">S3</span>
+        <span>
+          <a href="https://butantan.gov.br/noticias/maioria-dos-municipios-brasileiros-nao-atingiu-a-meta-de-cobertura-para-vacinas-do-calendario-infantil-em-2023" target="_blank">Instituto Butantan — Municípios abaixo da meta (2023)</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag red">S3</span>
+        <span>
+          <a href="https://sbim.org.br/noticias/anuario-vacinabr-analisa-cenario-das-coberturas-vacinais-no-brasil" target="_blank">SBIM — Anuário VacinaBR</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag yellow">S4</span>
+        <span>
+          <a href="https://www.metropoles.com/saude/pesquisa-aponta-principais-motivos-que-afastam-brasileiros-das-vacinas" target="_blank">Metrópoles / UFMG — Motivos da hesitância vacinal</a>
+        </span>
+      </li>
+    </ul>
+    <ul class="ref-list">
+      <li class="ref-item">
+        <span class="ref-tag yellow">S4</span>
+        <span>
+          <a href="https://sbmfc.org.br/noticias/hesitacao-vacinal/" target="_blank">SBMFC — Hesitação vacinal: marcadores sociais</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag yellow">S4</span>
+        <span>
+          <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10581683/" target="_blank">NIH PMC10581683 — Hesitância vacinal COVID-19 no Brasil</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag" style="border-color:var(--red);color:var(--red);background:#2a0808">S5</span>
+        <span>
+          <a href="https://www.scielosp.org/article/rpsp/2020.v44/e32/" target="_blank">SciELO — Custos de obesidade, hipertensão e diabetes no SUS (2020)</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag" style="border-color:var(--red);color:var(--red);background:#2a0808">S5</span>
+        <span>
+          <a href="https://hilab.com.br/blog/prevencao-e-controle-das-dcnt-e-a-reducao-de-custos-em-saude-publica/" target="_blank">Hilab — Prevenção de DCNT e redução de custos em saúde pública</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag green">S8</span>
+        <span>
+          <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8966995/" target="_blank">NIH PMC8966995 — Incentivos financeiros e vacinação (2022)</a>
+        </span>
+      </li>
+      <li class="ref-item">
+        <span class="ref-tag green">S8</span>
+        <span>
+          <a href="https://www.consumidormoderno.com.br/2021/03/18/incentivo-financeiro-principal-interesse-programas-de-fidelidade/" target="_blank">Consumidor Moderno — Incentivo financeiro em programas de fidelidade (2021)</a>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-top:.8rem;text-align:center;border-color:var(--gray)">
+    <p style="margin:0;font-size:.78rem;color:var(--gray)">
+      S# = número do slide onde o dado aparece &nbsp;·&nbsp;
+      Todos os links acessados em Junho/2026
+    </p>
+  </div>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  controls: true,
+  progress: true,
+  center: false,
+  width: 1280,
+  height: 720,
+  margin: 0.04,
+  pdfSeparateFragments: false,
+});
+
+// ── PDF export ────────────────────────────────────────────────────
+(function () {
+  const isPrintMode = /print-pdf/i.test(window.location.search);
+  const btn         = document.getElementById('pdf-btn');
+  const banner      = document.getElementById('print-banner');
+
+  if (isPrintMode) {
+    // estamos no modo impressão: mostrar banner, esconder botão
+    btn.style.display    = 'none';
+    banner.style.display = 'block';
+
+    // acionar print automaticamente após os slides renderizarem
+    Reveal.on('ready', function () {
+      setTimeout(function () { window.print(); }, 1200);
+    });
+  } else {
+    // modo normal: botão abre nova aba no modo print-pdf
+    btn.addEventListener('click', function () {
+      const url = window.location.href.split('?')[0] + '?print-pdf';
+      window.open(url, '_blank');
+    });
+  }
+})();
+</script>
+</body>
+</html>
