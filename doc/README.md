@@ -1,13 +1,5 @@
 # Documentação — Gamificação da Saúde Preventiva
 
-## Arquivos
-
-| Documento | Descrição |
-|---|---|
-| [relatorio-final.md](./relatorio-final.md) | Relatório de entrega do Hackathon |
-| [arquitetura.md](./arquitetura.md) | Decisões de arquitetura, catálogo de eventos, regras de negócio |
-| [como-rodar.md](./como-rodar.md) | Como buildar e subir o projeto via `make` |
-
 ## Postman
 
 Collection para testar o MVP: [`postman/saude-gamificada.postman_collection.json`](../postman/saude-gamificada.postman_collection.json)
